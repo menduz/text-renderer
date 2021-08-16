@@ -38,10 +38,47 @@ type Message = {
 }
 
 wss.on("connection", (socket) => {
-  console.log("> new connection")
+  console.log("new connection")
+  function send(type: string, payload: any) {
+    const msg = {
+      type,
+      payload: JSON.stringify(payload),
+    }
+    console.log("send", msg)
+    socket.send(JSON.stringify(msg))
+  }
 
+  send("SystemInfoReport", {
+    graphicsDeviceName: "Mocked",
+    graphicsDeviceVersion: "Mocked",
+    graphicsMemorySize: 512,
+    processorType: "n/a",
+    processorCount: 1,
+    systemMemorySize: 256,
+  })
+  send("AllScenesEvent", { eventType: "cameraModeChanged", payload: { cameraMode: 0 } })
+  send("SetBaseResolution", { baseResolution: 1080 })
+  send("ApplySettings", { voiceChatVolume: 1.0, voiceChatAllowCategory: 0 })
   socket.on("message", (message) => {
+
+    console.log(message.toString())
+
     const msg: Message = JSON.parse(Buffer.from(message as any).toString())
-    console.log(msg.type)
+
+    switch (msg.type) {
+      case "LoadParcelScenes":
+      case "CreateGlobalScene": {
+        // Fool the kernel telling it we have a scene ready to be used
+        const payload = JSON.parse(msg.payload)
+        send("ControlEvent", { eventType: "SceneReady", payload: { sceneId: payload.id } })
+        break
+      }
+      case "ActivateRendering": {
+        send("ControlEvent", { eventType: "ActivateRenderingACK" })
+        break
+      }
+      default:
+        // console.log("receive", msg)
+    }
   })
 })
