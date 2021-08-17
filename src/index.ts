@@ -28,7 +28,7 @@ const wss = new Server({
 })
 
 wss.on("listening", () => {
-  console.log("Listening")
+  console.log("Listening, navigate to https://play.decentraland.zone/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666")
 })
 
 type Message = {
@@ -60,10 +60,8 @@ wss.on("connection", (socket) => {
   send("SetBaseResolution", { baseResolution: 1080 })
   send("ApplySettings", { voiceChatVolume: 1.0, voiceChatAllowCategory: 0 })
   socket.on("message", (message) => {
-
-    console.log(message.toString())
-
     const msg: Message = JSON.parse(Buffer.from(message as any).toString())
+    console.log(msg.type)
 
     switch (msg.type) {
       case "LoadParcelScenes":
@@ -78,7 +76,7 @@ wss.on("connection", (socket) => {
         break
       }
       default:
-        // console.log("receive", msg)
+      // console.log("receive", msg)
     }
   })
 })
