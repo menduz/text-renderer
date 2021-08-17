@@ -28,7 +28,9 @@ const wss = new Server({
 })
 
 wss.on("listening", () => {
-  console.log("Listening, navigate to https://play.decentraland.zone/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666")
+  console.log(
+    "Listening, navigate to https://play.decentraland.zone/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666"
+  )
 })
 
 type Message = {
@@ -73,6 +75,10 @@ wss.on("connection", (socket) => {
       }
       case "ActivateRendering": {
         send("ControlEvent", { eventType: "ActivateRenderingACK" })
+        break
+      }
+      case "SendSceneMessage": {
+        console.log("SendSceneMessage", msg)
         break
       }
       default:
