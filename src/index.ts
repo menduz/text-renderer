@@ -29,7 +29,9 @@ const wss = new Server({
 
 wss.on("listening", () => {
   console.log(
-    "Listening, navigate to https://play.decentraland.zone/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666"
+    "Listening\n",
+    "  for full DCL navigate to https://play.decentraland.zone/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666\n",
+    "  for preview navigate to http://127.0.0.1:8000/?DEBUG_MESSAGES&FORCE_SEND_MESSAGE&DEBUG_REDUX&TRACE_RENDERER=350&position=0%2C0&realm=fenrir-amber&ws=ws%3A%2F%2F127.0.0.1%3A7666\n"
   )
 })
 
@@ -46,7 +48,7 @@ wss.on("connection", (socket) => {
       type,
       payload: JSON.stringify(payload),
     }
-    console.log("send", msg)
+    console.log(">>> send", msg)
     socket.send(JSON.stringify(msg))
   }
 
@@ -63,13 +65,14 @@ wss.on("connection", (socket) => {
   send("ApplySettings", { voiceChatVolume: 1.0, voiceChatAllowCategory: 0 })
   socket.on("message", (message) => {
     const msg: Message = JSON.parse(Buffer.from(message as any).toString())
-    console.log(msg.type)
+    console.log("<<< recv", msg.type)
 
     switch (msg.type) {
       case "LoadParcelScenes":
       case "CreateGlobalScene": {
         // Fool the kernel telling it we have a scene ready to be used
         const payload = JSON.parse(msg.payload)
+        console.log("  Creating local scene", payload.id)
         send("ControlEvent", { eventType: "SceneReady", payload: { sceneId: payload.id } })
         break
       }
@@ -79,7 +82,9 @@ wss.on("connection", (socket) => {
       }
       case "SendSceneMessage": {
         // these are the entity messages from the scenes:
-        console.log("SendSceneMessage", msg)
+        msg.payload.split(/\n/g).forEach((base64Message) => {
+          console.dir(base64Message)
+        })
         break
       }
       default:
