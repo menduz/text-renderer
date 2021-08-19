@@ -72,7 +72,7 @@ wss.on("connection", (socket) => {
       case "CreateGlobalScene": {
         // Fool the kernel telling it we have a scene ready to be used
         const payload = JSON.parse(msg.payload)
-        console.log("  Creating local scene", payload.id)
+        console.log("Creating local scene:", payload)
         send("ControlEvent", { eventType: "SceneReady", payload: { sceneId: payload.id } })
         break
       }
