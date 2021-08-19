@@ -78,6 +78,7 @@ wss.on("connection", (socket) => {
         break
       }
       case "SendSceneMessage": {
+        // these are the entity messages from the scenes:
         console.log("SendSceneMessage", msg)
         break
       }
