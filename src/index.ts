@@ -52,6 +52,10 @@ wss.on("connection", (socket) => {
     socket.send(JSON.stringify(msg))
   }
 
+  const scenes = new Map<string, any>()
+
+  // This event `SystemInfoReport` is used to signal that the renderer
+  // is initialized and ready to receive messages
   send("SystemInfoReport", {
     graphicsDeviceName: "Mocked",
     graphicsDeviceVersion: "Mocked",
@@ -60,9 +64,11 @@ wss.on("connection", (socket) => {
     processorCount: 1,
     systemMemorySize: 256,
   })
+
   send("AllScenesEvent", { eventType: "cameraModeChanged", payload: { cameraMode: 0 } })
   send("SetBaseResolution", { baseResolution: 1080 })
   send("ApplySettings", { voiceChatVolume: 1.0, voiceChatAllowCategory: 0 })
+
   socket.on("message", (message) => {
     const msg: Message = JSON.parse(Buffer.from(message as any).toString())
     console.log("<<< recv", msg.type)
@@ -72,10 +78,17 @@ wss.on("connection", (socket) => {
       case "CreateGlobalScene": {
         // Fool the kernel telling it we have a scene ready to be used
         const payload = JSON.parse(msg.payload)
-        console.log("Creating local scene:", payload)
+        console.log("Creating local scene:", payload.id)
+        scenes.set(payload.id, payload)
         send("ControlEvent", { eventType: "SceneReady", payload: { sceneId: payload.id } })
         break
       }
+      case "ShowAvatarEditorInSignUp": {
+        send("SendPassport", { name: "BetaTester", email: "hello@decentraland.zone" })
+        break
+      }
+
+      case "ForceActivateRendering":
       case "ActivateRendering": {
         send("ControlEvent", { eventType: "ActivateRenderingACK" })
         break

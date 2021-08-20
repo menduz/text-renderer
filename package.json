@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_OPTIONS='--inspect' ts-node --project tsconfig.json src/index.ts"
+    "start": "ts-node --project tsconfig.json src/index.ts",
+    "start:debug": "NODE_OPTIONS='--inspect' ts-node --project tsconfig.json src/index.ts"
   },
   "keywords": [],
   "author": "",
